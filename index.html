@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISCU Link Hub</title>
+    <!-- 引入 FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           CSS 樣式表
+           ========================================= */
+
+        /* --- 全局變數與基礎設定 --- */
+        :root {
+            --bg-color: #030508;
+            --primary-color: #00f0ff; /* 科技青 */
+            --primary-dim: rgba(0, 240, 255, 0.1);
+            --secondary-color: #ff003c; /* 賽博龐克紅 */
+            --text-color: #e0f7fa;
+            --glass-bg: rgba(10, 20, 30, 0.4);
+            --glass-border: rgba(0, 240, 255, 0.3);
+            --glass-hover: rgba(0, 240, 255, 0.15);
+            
+            /* 字體設定 */
+            --font-title: 'Orbitron', sans-serif;
+            --font-tech: 'Share Tech Mono', monospace;
+            --font-body: 'Rajdhani', sans-serif; /* 主要用於 FEATURE REWRITE */
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-body);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- 未來科技風：背景網格 (Grid Overlay) --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -3;
+            pointer-events: none;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+        }
+
+        /* --- 背景 SVG 動畫 --- */
+        .bg-animation {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -2;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin-reverse { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+
+        .bg-wheel-svg {
+            width: 140vmin;
+            height: 140vmin;
+            opacity: 0.15;
+            animation: spin 80s linear infinite;
+        }
+
+        @media (min-width: 768px) {
+            .bg-wheel-svg { width: 100vmin; height: 100vmin; }
+        }
+
+        .inner-wheel-group {
+            transform-origin: 500px 500px;
+            animation: spin-reverse 50s linear infinite;
+        }
+
+        /* --- FEATURE REWRITE 樣式調整 (左上角) --- */
+        .feature-text-layer {
+            position: fixed;
+            top: 40px;
+            left: 40px;
+            z-index: -1;
+            text-align: left;
+            pointer-events: none;
+            line-height: 0.85; /* 讓兩行字更緊湊 */
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 900;
+            font-size: 4rem;
+            letter-spacing: 2px;
+        }
+
+        .feature-solid {
+            color: rgba(255, 255, 255, 0.15); /* 實心，低透明度 */
+            display: block;
+        }
+
+        .feature-hollow {
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.15); /* 空心描邊 */
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .feature-text-layer { 
+                top: 20px; 
+                left: 20px; 
+                font-size: 2.5rem; 
+            }
+        }
+
+        /* --- 主要容器 --- */
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 100px 20px 60px;
+            text-align: center;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- 頭像與標題 --- */
+        .profile-section {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .avatar-ring {
+            position: absolute;
+            top: -10px; left: -10px;
+            width: calc(100% + 20px); height: calc(100% + 20px);
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            border-left-color: transparent;
+            border-right-color: transparent;
+            animation: spin 8s linear infinite;
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        .avatar-ring::after {
+            content: '';
+            position: absolute;
+            top: 5px; left: 5px; right: 5px; bottom: 5px;
+            border-radius: 50%;
+            border: 1px dashed var(--secondary-color);
+            animation: spin-reverse 12s linear infinite;
+            opacity: 0.8;
+        }
+
+        .avatar {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background-color: #000;
+            object-fit: cover;
+            position: relative;
+            z-index: 2;
+            border: 2px solid var(--bg-color);
+        }
+
+        h1 {
+            font-family: var(--font-title);
+            font-size: 2.8rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: #fff;
+            text-shadow: 
+                0 0 10px var(--primary-color),
+                0 0 20px var(--primary-color),
+                0 0 40px var(--primary-color);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: "SYSTEM.ONLINE";
+            display: block;
+            font-size: 0.6rem;
+            font-family: var(--font-tech);
+            letter-spacing: 4px;
+            color: var(--primary-color);
+            opacity: 0.8;
+            margin-top: 5px;
+            text-shadow: none;
+        }
+
+        p.bio {
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            color: #aaccff;
+            margin-top: 15px;
+            line-height: 1.6;
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 500;
+        }
+
+        /* --- 社群小圖示 --- */
+        .social-row {
+            display: flex;
+            justify-content: center;
+            gap: 50px; 
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 2rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 10px var(--primary-color));
+        }
+
+        /* --- Linktree 連結按鈕 --- */
+        .links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .link-card {
+            position: relative;
+            background: var(--glass-bg);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-left: 4px solid var(--primary-color);
+            
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 0; 
+            height: 72px;
+            
+            clip-path: polygon(
+                0 0, 100% 0, 
+                100% calc(100% - 15px), calc(100% - 15px) 100%, 
+                0 100%
+            );
+            
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            overflow: hidden;
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .link-content-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 30px;
+        }
+
+        .link-icon-small {
+            margin-right: 15px;
+            font-size: 1.1em;
+            color: var(--primary-color);
+            transition: 0.3s;
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+
+        .link-bg-icon {
+            position: absolute;
+            right: 0px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-20deg);
+            font-size: 4.5rem;
+            color: var(--primary-color);
+            opacity: 0.08;
+            z-index: 1;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        .link-card:hover {
+            background: rgba(0, 240, 255, 0.1);
+            transform: translateX(5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
+        }
+
+        .link-card:hover .link-bg-icon {
+            opacity: 0.25;
+            transform: translateY(-50%) rotate(0deg) scale(1.1);
+            right: 20px;
+            color: var(--text-color);
+        }
+
+        .link-card:hover .link-icon-small {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .link-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 0; height: 0;
+            border-style: solid;
+            border-width: 0 15px 15px 0;
+            border-color: transparent var(--primary-color) transparent transparent;
+            opacity: 0.5;
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 80px;
+            font-family: var(--font-tech);
+            font-size: 0.85rem;
+            color: #556677;
+            letter-spacing: 1px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 20px;
+            width: 100%;
+            line-height: 1.5;
+        }
+
+        .footer-email {
+            color: var(--primary-color);
+            opacity: 0.8;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 背景 SVG 動畫 -->
+    <div class="bg-animation">
+        <svg class="bg-wheel-svg" viewBox="0 0 1000 1000">
+            <defs>
+                <linearGradient id="wheel-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#06b6d4" stop-opacity="0" />
+                    <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.8" />
+                    <stop offset="100%" stop-color="#06b6d4" stop-opacity="0" />
+                </linearGradient>
+            </defs>
+
+            <circle cx="500" cy="500" r="450" fill="none" stroke="url(#wheel-gradient)" stroke-width="6" stroke-dasharray="40 20" opacity="0.6" />
+            
+            <g class="inner-wheel-group">
+                <circle cx="500" cy="500" r="350" fill="none" stroke="#0891b2" stroke-width="4" opacity="0.4" />
+                <rect x="492" y="140" width="16" height="40" fill="#06b6d4" transform="rotate(0 500 500)" />
+                <rect x="492" y="140" width="16" height="40" fill="#06b6d4" transform="rotate(45 500 500)" />
+                <rect x="492" y="140" width="16" height="40" fill="#06b6d4" transform="rotate(90 500 500)" />
+                <rect x="492" y="140" width="16" height="40" fill="#06b6d4" transform="rotate(135 500 500)" />
+                <rect x="492" y="140" width="16" height="40" fill="#06b6d4" transform="rotate(180 500 500)" />
+                <rect x="492" y="140" width="16" height="40" fill="#06b6d4" transform="rotate(225 500 500)" />
+                <rect x="492" y="140" width="16" height="40" fill="#06b6d4" transform="rotate(270 500 500)" />
+                <rect x="492" y="140" width="16" height="40" fill="#06b6d4" transform="rotate(315 500 500)" />
+            </g>
+        </svg>
+    </div>
+
+    <!-- FEATURE REWRITE 左上角裝飾文字 -->
+    <div class="feature-text-layer">
+        <div class="feature-solid">FEATURE</div>
+        <div class="feature-hollow">REWRITE</div>
+    </div>
+
+    <div class="container">
+        <!-- 個人資料區 -->
+        <div class="profile-section">
+            <div class="avatar-container">
+                <div class="avatar-ring"></div>
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Avatar" class="avatar" id="avatarImg">
+            </div>
+            <h1 id="pageTitle">AISCU</h1>
+            <p class="bio" id="pageBio">FUTURE INTERFACE<br>重寫你的未來方程式 | 人工智慧應用社</p>
+        </div>
+
+        <!-- 社群小按鈕區 (IG/FB/Mail) -->
+        <div class="social-row" id="socialsList">
+            <!-- 由 JS 生成 -->
+        </div>
+
+        <!-- 主要連結區 -->
+        <div class="links-container" id="linksList">
+            <!-- 由 JS 生成 -->
+        </div>
+
+        <footer>
+            <span class="footer-email">ai.scu.club@gmail.com</span>
+            SYSTEM.ONLINE // AISCU © 2025
+        </footer>
+    </div>
+
+    <script>
+        // =========================================================
+        //                 ✨ 用戶維護區 (CONFIG) ✨
+        // =========================================================
+        
+        const CONFIG = {
+            // 1. 基本資料
+            avatarUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=200&auto=format&fit=crop", 
+            title: "AISCU", 
+            bio: "重寫你的未來方程式<br>人工智慧應用社 | Tech & AI",
+
+            // 2. 社群小按鈕 (IG, FB, Mail)
+            socials: [
+                { url: "https://instagram.com", icon: "fab fa-instagram" },
+                { url: "https://facebook.com", icon: "fab fa-facebook" },
+                { url: "mailto:ai.scu.club@gmail.com", icon: "fas fa-envelope" } // 新增 Mail
+            ],
+
+            // 3. 主要連結列表 (大按鈕)
+            links: [
+                { text: "幹部招新報名", url: "#", icon: "fas fa-user-tie" },
+                { text: "社員招募中", url: "#", icon: "fas fa-users" },
+                { text: "官方網站", url: "#", icon: "fas fa-globe" },
+                { text: "聯絡我們", url: "mailto:ai.scu.club@gmail.com", icon: "fas fa-envelope" }
+            ]
+        };
+
+        // =========================================================
+        //            👇 系統邏輯 (System Logic) 👇
+        // =========================================================
+
+        function initPage() {
+            document.getElementById('avatarImg').src = CONFIG.avatarUrl;
+            document.getElementById('pageTitle').innerText = CONFIG.title;
+            document.getElementById('pageBio').innerHTML = CONFIG.bio;
+
+            // 1. 社群小按鈕
+            const socialsContainer = document.getElementById('socialsList');
+            socialsContainer.innerHTML = '';
+            
+            CONFIG.socials.forEach(item => {
+                const a = document.createElement('a');
+                a.href = item.url;
+                a.className = 'social-btn';
+                a.target = "_blank";
+                a.innerHTML = `<i class="${item.icon}"></i>`;
+                socialsContainer.appendChild(a);
+            });
+
+            // 2. 主要連結
+            const linksContainer = document.getElementById('linksList');
+            linksContainer.innerHTML = ''; 
+            
+            CONFIG.links.forEach((link, index) => {
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.className = 'link-card';
+                a.target = "_blank"; 
+                
+                // 動畫延遲
+                a.style.animation = `fade-in-right 0.5s ease forwards ${index * 0.15}s`;
+                a.style.opacity = '0';
+                
+                const iconClass = link.icon || 'fas fa-link';
+                
+                a.innerHTML = `
+                    <div class="link-bg-icon">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="link-content-wrapper">
+                        ${link.icon ? `<i class="${link.icon} link-icon-small"></i>` : ''}
+                        <span>${link.text}</span>
+                    </div>
+                `;
+                
+                linksContainer.appendChild(a);
+            });
+        }
+
+        // 動畫：從左側滑入
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes fade-in-right {
+                from { opacity: 0; transform: translateX(-20px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        initPage();
+
+    </script>
+</body>
+</html>
