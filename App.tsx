@@ -17,16 +17,28 @@ const App: React.FC = () => {
 
       {/* Main Content Container */}
       <div className="relative z-10 w-full max-w-[480px] px-5 pt-8 md:pt-24 pb-16 flex flex-col items-center text-center">
-        
-        <ProfileHeader 
-          avatarUrl={CONFIG.avatarUrl} 
-          title={CONFIG.title} 
-          subtitle={CONFIG.subtitle}
-          logoUrl={CONFIG.logoUrl}
-          bio={CONFIG.bio} 
-        />
 
-        <SocialLinks socials={CONFIG.socials} />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          <ProfileHeader
+            avatarUrl={CONFIG.avatarUrl}
+            title={CONFIG.title}
+            subtitle={CONFIG.subtitle}
+            logoUrl={CONFIG.logoUrl}
+            bio={CONFIG.bio}
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+        >
+          <SocialLinks socials={CONFIG.socials} />
+        </motion.div>
 
         <div className="w-full flex flex-col gap-3.5 md:gap-5">
           <AnimatePresence>
@@ -35,16 +47,16 @@ const App: React.FC = () => {
                 key={link.text}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ 
-                  duration: 0.5, 
-                  ease: "easeOut", 
-                  delay: index * 0.1 
+                transition={{
+                  duration: 0.5,
+                  ease: "easeOut",
+                  delay: 0.4 + (index * 0.1)
                 }}
               >
-                <LinkCard 
-                  text={link.text} 
-                  url={link.url} 
-                  icon={link.icon} 
+                <LinkCard
+                  text={link.text}
+                  url={link.url}
+                  icon={link.icon}
                 />
               </motion.div>
             ))}
